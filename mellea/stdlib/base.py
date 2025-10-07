@@ -48,6 +48,24 @@ class CBlock:
     def __repr__(self):
         """Provides a python-parsable representation of the block (usually)."""
         return f"CBlock({self.value}, {self._meta.__repr__()})"
+    
+    def mark_tainted(self, level: str = "tainted"):
+        """Mark this CBlock as tainted.
+        
+        Args:
+            level: Security level ("safe", "tainted", "proprietary", "sanitized")
+        """
+        from mellea.security import SecurityLevel, SecurityMetadata
+        security_level = SecurityLevel(level)
+        
+        self._meta["_security"] = SecurityMetadata(level=security_level)
+    
+    def is_safe(self) -> bool:
+        """Check if this CBlock is safe for privileged operations."""
+        security = self._meta.get("_security")
+        if security is None:
+            return True
+        return security.is_safe()
 
 
 class ImageBlock:
